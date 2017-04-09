@@ -121,7 +121,7 @@ var actions = {
 				item.hidden = false;
 				return {message: command.subject + ' dropped', success: true};
 			} catch(error2){
-				return {message: 'You do not have a ' + command.subject + ' to drop.', success: false};
+				return {message: 'You do not have '+ AorAN(command.subject.charAt(0)) + command.subject + ' to drop.', success: false};
 			}
 		}
 	},
@@ -227,7 +227,7 @@ var actions = {
 // ----------------------------/
 function checkForGameEnd(game, returnString){
 	if(game.gameOver){
-	returnString = returnString + '\n' + game.outroText;
+		returnString = returnString + '\n' + game.outroText;
 		actions.die(game,{action:'die'});
 	} 
 	return returnString;
@@ -351,7 +351,7 @@ function itemsToString(itemsObject){
 		if(visibleItems[i].quantity > 1){
 			returnString = returnString.concat(visibleItems[i].quantity+' '+visibleItems[i].name+'s');
 		} else {
-			returnString = returnString.concat('a '+visibleItems[i].name);
+			returnString = returnString.concat(AorAN(visibleItems[i].name.charAt(0))+visibleItems[i].name);
 		}
 		if(i === visibleItems.length-2){
 			returnString = returnString.concat(' and ');
@@ -362,6 +362,15 @@ function itemsToString(itemsObject){
 		}
 	}
 	return returnString;
+}
+
+function AorAN(c) {
+	if (['a', 'e', 'i', 'o'].indexOf(c.toLowerCase()) !== -1){
+		return 'an ';
+	}
+	else{
+		return 'a ';
+	}
 }
 
 function interact(game, interaction, subject){
