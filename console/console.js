@@ -292,7 +292,10 @@ function getLocationDescription(game, forcedLongDescription){
 	var currentLocation = getCurrentLocation(game);
 	var description;
 	if(currentLocation.firstVisit || forcedLongDescription){
-		description = currentLocation.description;
+        description = currentLocation.description;
+        if (currentLocation.interactables) {
+            description = description.concat(interactablesToString(currentLocation.interactables));
+        }
 		if(currentLocation.items){
 			description = description.concat(itemsToString(currentLocation.items));
 		}
@@ -342,11 +345,45 @@ function itemsToString(itemsObject){
 	return returnString;
 }
 
+function interactablesToString(interactablesObject) {
+    var numOfInteractables = Object.keys(interactablesObject).length;
+    if (numOfInteractables === 0) {
+        return '.';
+    }
+    var visibleInteractables = [];
+    for (var interactable in interactablesObject) {
+        var interactableObject = interactablesObject[interactable];
+        if (!interactableObject.hidden && interactableObject.description != null) {
+            visibleInteractables.push({ description: interactableObject.description });
+        }
+    }
+    if (visibleInteractables.length === 0) {
+        return '.';
+    }
+    var returnString = '';
+    for (i = 0; i < visibleInteractables.length; ++i) {
+        if (i == 0) {
+            returnString = returnString.concat(' ');
+        }
+        else if (i < visibleInteractables.length-1) {
+            returnString = returnString.concat(', ');
+        }
+        else if (i+1 === visibleInteractables.length) {
+            returnString = returnString.concat(' and ');
+        }
+        returnString = returnString.concat(visibleInteractables[i].description);
+    }
+    returnString = returnString.concat('.');
+    return returnString;
+}
+
 function interact(game, interaction, subject){
 	try{
-		return message = getCurrentLocation(game).items[subject].interactions[interaction];
+        var message = getCurrentLocation(game).items[subject].interactions[interaction];
+        return message;
 	} catch(error) {
-		return getCurrentLocation(game).interactables[subject][interaction];
+        var message = getCurrentLocation(game).interactables[subject][interaction]();
+        return message;
 	}
 }
 

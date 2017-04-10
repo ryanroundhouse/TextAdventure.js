@@ -2,25 +2,38 @@ var helper = require('../helper/helper.js');
 
 // === Game Data ===
 var gameData = {
-	commandCounter : 0,
-	gameOver : false,
-	introText : 'Welcome to the Crooked Gulch Gold Mine. What it lacks in safety precautions it more than makes up for in gold. Watch your step and you might just make it out with riches beyond your wildest imagination!',
-	outroText : 'Thanks For playing!',
-	player : {
-		currentLocation : 'MineEntrance',
-		inventory : {},
-		lightSource : false
-	},
-	map : {
-		'MineEntrance' : {
-			firstVisit : true,
-			displayName : 'Mine Entrance',
-			description : 'You stand at the partially collapsed entrance to the mine. Nearby there is a sign sticking out of a pile of miner helmets and a small metal grill on embedded in the rock face.',
-			interactables : {
-				helmets : { look : 'It is a pile of miner helmets with lights on them. They seem to still be operational.' },
-				sign : { look : 'The sign reads "Crooked Gulch Gold Mine" and has a note tacked to the bottom of it.' },
-				note : { look : 'Written in an untidy scroll the note reads "Generator blew. Lights out."' },
-				grill : { look : 'A light blinks on a small steel grill on the side of the mountain.  You hear the static of a radio signal emitting from it. It\'s an intercom.' }
+    commandCounter : 0,
+    gameOver : false,
+    introText : 'Welcome to the Crooked Gulch Gold Mine. What it lacks in safety precautions it more than makes up for in gold. Watch your step and you might just make it out with riches beyond your wildest imagination!',
+    outroText : 'Thanks For playing!',
+    player : {
+        currentLocation : 'MineEntrance',
+        inventory : {},
+        lightSource : false
+    },
+    map : {
+        'MineEntrance' : {
+            firstVisit : true,
+            displayName : 'Mine Entrance',
+            description : 'You stand at the partially collapsed entrance to the mine. Nearby there is',
+            interactables : {
+                helmets : {
+                    look : 'It is a pile of miner helmets with lights on them. They seem to still be operational.',
+                    description : 'a sign sticking out of a pile of miner helmets',
+                    hidden : false
+                },
+                sign : { look : 'The sign reads "Crooked Gulch Gold Mine" and has a note tacked to the bottom of it.' },
+                note : { look : 'Written in an untidy scroll the note reads "Generator blew. Lights out."' },
+                grill : {
+                    description : 'a small metal grill embedded in the rock face',
+                    look : function () { return hideAndDisplayText(this, gameData.map.MineEntrance.interactables.intercom); },
+                    hidden : false
+                },
+                intercom : {
+                    description : 'an intercom emitting a low volume static signal',
+                    look : 'The static signal follows no recognizable pattern.  This intercom must be working off of a different power source.',
+                    hidden : true
+                }
 			},
 			items : {
 				helmet : {
@@ -96,4 +109,10 @@ function useLightSource(){
 function equip(item){
 	item.equiped = true;
 	return item.wearText;
+}
+
+function hideAndDisplayText(thingToHide, thingToShow) {
+    thingToHide.hidden = true;
+    thingToShow.hidden = false;
+    return 'A light blinks on a small steel grill on the side of the mountain.  You hear the static of a radio signal emitting from it. It\'s an intercom.';
 }
