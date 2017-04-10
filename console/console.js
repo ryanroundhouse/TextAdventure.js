@@ -4,6 +4,7 @@ var debugMode = false;
 // === Import Necessary Functionality ===
 var fileSystem = require('fs');
 var parser = require('./parser.js');
+var helper = require('../helper/helper.js');
 
 // === Creat Necessary Variables ===
 var games = {};
@@ -51,7 +52,7 @@ exports.input = function(input, gameID){
 		if(updateLocationString !== undefined){
 			returnString = updateLocationString;
 		}
-		return checkForGameEnd(game, returnString);
+		return helper.checkForGameEnd(game, returnString, actions);
 	} else {
 		console.log(gameID + ': no game');
 		if(command.action === 'load'){
@@ -116,12 +117,12 @@ var actions = {
 		} catch(error) {
 			try {
 				var currentLocation = getCurrentLocation(game);
-				moveItem(command.subject, game.player.inventory, currentLocation.items);
-				var item = getItem(currentLocation.items, command.subject);
+				helper.moveItem(command.subject, game.player.inventory, currentLocation.items);
+				var item = helper.getItem(currentLocation.items, command.subject);
 				item.hidden = false;
 				return {message: command.subject + ' dropped', success: true};
 			} catch(error2){
-				return {message: 'You do not have '+ AorAN(command.subject.charAt(0)) + command.subject + ' to drop.', success: false};
+				return {message: 'You do not have '+ helper.aOrAn(command.subject.charAt(0)) + command.subject + ' to drop.', success: false};
 			}
 		}
 	},
@@ -164,6 +165,9 @@ var actions = {
 			if(itemObject.quantity > 1){
 				itemName = itemName.concat(' x'+itemObject.quantity);
 			}
+			if (itemObject.equiped){
+				itemName = itemName.concat(' (equipped)');
+			}
 			inventoryList = inventoryList.concat('\n'+itemName);
 		}
 		if (inventoryList === 'Your inventory contains:'){
@@ -179,9 +183,9 @@ var actions = {
 		}
 		try {
 			try {
-				return {message: getItem(game.player.inventory, command.subject).description, success: true};
+				return {message: helper.getItem(game.player.inventory, command.subject).description, success: true};
 			} catch (itemNotInInventoryError){
-				return {message: getItem(getCurrentLocation(game).items, command.subject).description, success: true};
+				return {message: helper.getItem(getCurrentLocation(game).items, command.subject).description, success: true};
 			}
 		} catch(isNotAnItemError) {
 			try {
@@ -201,7 +205,7 @@ var actions = {
 			return {message: interact(game, 'take', command.subject), success: true};
 		} catch(error) {
 			try {
-				moveItem(command.subject, getCurrentLocation(game).items, game.player.inventory);
+				helper.moveItem(command.subject, getCurrentLocation(game).items, game.player.inventory);
 				return {message: command.subject + ' taken', success: true};
 			} catch(error2){
 				return {message: 'Best just to leave the ' + command.subject + ' as it is.', success: false};
@@ -214,9 +218,20 @@ var actions = {
 			return {message: 'What would you like to use?', success: false};
 		}
 		try {
-			return {message: getItem(game.player.inventory, command.subject).use(), success: true};
+			return {message: helper.getItem(game.player.inventory, command.subject).use(), success: true};
 		} catch (itemNotInInventoryError) {
 			return {message: 'Can\'t do that.', success: false};
+		}
+	},
+	
+	wear : function(game, command){
+		if (!command.subject){
+			return {message: 'What do you want to wear?', success: false};
+		}
+		try{
+			return {message: helper.getItem(game.player.inventory, command.subject).wear(), success: true}
+		} catch(subjectNotFound){
+			return {message: 'You can\'t wear '+ helper.aOrAn(command.subject.charAt(0)) + command.subject, success: false};
 		}
 	}
 };
@@ -225,27 +240,6 @@ var actions = {
 // ----------------------------\
 // === Helper Functions ===============================================================================================
 // ----------------------------/
-function checkForGameEnd(game, returnString){
-	if(game.gameOver){
-		returnString = returnString + '\n' + game.outroText;
-		actions.die(game,{action:'die'});
-	} 
-	return returnString;
-}
-
-function clone(obj) {
-    if(obj == null || typeof(obj) != 'object'){
-        return obj;
-    }
-    var temp = obj.constructor();
-    for(var key in obj) {
-        if(obj.hasOwnProperty(key)) {
-            temp[key] = clone(obj[key]);
-        }
-    }
-    return temp;
-}
-
 function consoleInterface(game, command){
 	return eval('actions.'+command.action+'(game,command);')
 }
@@ -311,22 +305,6 @@ function getLocationDescription(game, forcedLongDescription){
 	return description;
 }
 
-function getItem(itemLocation, itemName){
-	return itemLocation[getItemName(itemLocation, itemName)];
-}
-
-function getItemName(itemLocation, itemName){
-	if(itemLocation[itemName] !== undefined) {
-		return itemName;
-	} else {
-		for(var item in itemLocation){
-			if(itemLocation[item].displayName.toLowerCase() === itemName){
-				return item;
-			}
-		}
-	}
-}
-
 function itemsToString(itemsObject){
 	var numOfItems = Object.keys(itemsObject).length;
 	if(numOfItems === 0){
@@ -351,7 +329,7 @@ function itemsToString(itemsObject){
 		if(visibleItems[i].quantity > 1){
 			returnString = returnString.concat(visibleItems[i].quantity+' '+visibleItems[i].name+'s');
 		} else {
-			returnString = returnString.concat(AorAN(visibleItems[i].name.charAt(0))+visibleItems[i].name);
+			returnString = returnString.concat(helper.aOrAn(visibleItems[i].name.charAt(0))+visibleItems[i].name);
 		}
 		if(i === visibleItems.length-2){
 			returnString = returnString.concat(' and ');
@@ -364,15 +342,6 @@ function itemsToString(itemsObject){
 	return returnString;
 }
 
-function AorAN(c) {
-	if (['a', 'e', 'i', 'o'].indexOf(c.toLowerCase()) !== -1){
-		return 'an ';
-	}
-	else{
-		return 'a ';
-	}
-}
-
 function interact(game, interaction, subject){
 	try{
 		return message = getCurrentLocation(game).items[subject].interactions[interaction];
@@ -381,23 +350,3 @@ function interact(game, interaction, subject){
 	}
 }
 
-function moveItem(itemName, startLocation, endLocation){
-	var itemName = getItemName(startLocation, itemName);
-	var itemAtOrigin = getItem(startLocation, itemName);
-	if(itemAtOrigin === undefined){
-		throw 'itemDoesNotExist';
-	}
-	var itemAtDestination = getItem(endLocation, itemName);
-	if(itemAtDestination === undefined) {
-		endLocation[itemName] = clone(itemAtOrigin);
-		endLocation[itemName].quantity = 1;
-	} else {
-		++endLocation[itemName].quantity;
-	}
-	if (itemAtOrigin.hasOwnProperty('quantity')){
-		--itemAtOrigin.quantity;
-		if(itemAtOrigin.quantity === 0){
-			delete startLocation[itemName];
-		}
-	}
-}
