@@ -34,7 +34,15 @@ var gameData = {
                     look : 'The static signal follows no recognizable pattern.  This intercom must be working off of a different power source.',
                     hidden : true
                 }
-			},
+            },
+            actors : {
+                prospector : {
+                    description : 'a grizzled old prospector',
+                    look : 'The prospector chews on an old corn cob pipe, trying to unblock the mouthpiece.  You can see the dust billowing off of his rags with every jittery move he makes.',
+                    talk : function () { return 'The prospector glances up from his pipe.  He shows a wide toothy smile. "Howdy strangih!  Whachu doin\' round my parts?"' },
+                    hidden : false
+                }
+            },
 			items : {
 				helmet : {
 					displayName : 'Miner Helmet',

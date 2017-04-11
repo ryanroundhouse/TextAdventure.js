@@ -211,7 +211,23 @@ var actions = {
 				return {message: 'Best just to leave the ' + command.subject + ' as it is.', success: false};
 			}
 		}
-	},
+    },
+    
+    talk : function (game, command) {
+        if (!command.subject) {
+            return { message: 'You grumble to yourself about your current state of affairs.', success: false };
+        }
+        try {
+            return { message: getActor(game, command.subject).talk(), success: true };
+        } catch (noTalkFunction) {
+            try {
+                return { message: getActor(game, command.subject).talk, success: true };
+            }
+            catch (noTalkMessage) {
+                return { message: 'There\'s no ' + command.subject + ' to talk to.', success: false };
+            }
+        }
+    },
 
 	use : function(game, command){
 		if(!command.subject){
@@ -298,7 +314,10 @@ function getLocationDescription(game, forcedLongDescription){
         }
 		if(currentLocation.items){
 			description = description.concat(itemsToString(currentLocation.items));
-		}
+        }
+        if (currentLocation.actors) {
+            description = description.concat(actorsToString(currentLocation.actors));   
+        }
 		if(currentLocation.exits){
 			description = description.concat(exitsToString(currentLocation.exits));
 		}
@@ -306,6 +325,35 @@ function getLocationDescription(game, forcedLongDescription){
 		description = currentLocation.displayName;
 	}
 	return description;
+}
+
+function actorsToString(actorsObject) {
+    var numOfActors= Object.keys(actorsObject).length;
+    if (numOfActors === 0) {
+        return '';
+    }
+    var visibleActors = [];
+    for (var actor in actorsObject) {
+        var actorObject = actorsObject[actor];
+        if (!actorObject.hidden) {
+            visibleActors.push({ description: actorObject.description });
+        }
+    }
+    if (visibleActors.length === 0) {
+        return '';
+    }
+    var returnString = ' Milling about the area, you see ';
+    for (i = 0; i < visibleActors.length; ++i) {
+        returnString = returnString.concat(visibleActors[i].description);
+        if (i === visibleActors.length - 2) {
+            returnString = returnString.concat(' and ');
+        } else if (i === visibleActors.length - 1) {
+            returnString = returnString.concat('.');
+        } else {
+            returnString = returnString.concat(', ');
+        }
+    }
+    return returnString;
 }
 
 function itemsToString(itemsObject){
@@ -377,13 +425,24 @@ function interactablesToString(interactablesObject) {
     return returnString;
 }
 
+function getActor(game, subject) {
+    var actor = getCurrentLocation(game).actors[subject];
+    return actor;
+}
+
 function interact(game, interaction, subject){
 	try{
         var message = getCurrentLocation(game).items[subject].interactions[interaction];
         return message;
-	} catch(error) {
-        var message = getCurrentLocation(game).interactables[subject][interaction]();
-        return message;
+    } catch (notAnItemError) {
+        try {
+            var message = getCurrentLocation(game).actors[subject][interaction];
+            return message;
+        }
+        catch (notAnActorError) {
+            var message = getCurrentLocation(game).interactables[subject][interaction]();
+            return message;
+        }
 	}
 }
 
