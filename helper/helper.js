@@ -23,6 +23,29 @@ var getItemName = function (itemLocation, itemName) {
     }
 }
 
+var getCurrentLocation = function (game) {
+    return game.map[game.player.currentLocation];
+}
+
+var returnTargetInCurrentLocation = function (game, target) {
+    var currentLocation = getCurrentLocation(game);
+    for (var item in currentLocation.items) {
+        if (currentLocation.items[item].hidden != true && item.toLowerCase() === target.toLowerCase()) {
+            return currentLocation.items[item];
+        }
+    }
+    for (var interaction in currentLocation.interactables) {
+        if (currentLocation.interactables[interaction].hidden != true && interaction.toLowerCase() === target.toLowerCase()) {
+            return currentLocation.interactables[interaction];
+        }
+    }
+    for (var actor in currentLocation.actors) {
+        if (currentLocation.actors[actor].hidden != true && actor.toLowerCase() === target.toLowerCase()) {
+            return currentLocation.actors[actor];
+        }
+    }
+}
+
 var checkForGameEnd = function (game, returnString, actions) {
     if (game.gameOver) {
         returnString = returnString + '\n' + game.outroText;
@@ -71,5 +94,7 @@ module.exports = {
     getItemName: getItemName,
     checkForGameEnd: checkForGameEnd,
     moveItem: moveItem,
-    clone: clone
+    clone: clone,
+    returnTargetInCurrentLocation : returnTargetInCurrentLocation,
+    getCurrentLocation : getCurrentLocation
 }

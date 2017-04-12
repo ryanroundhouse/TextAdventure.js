@@ -43,7 +43,7 @@ exports.input = function(input, gameID){
 			returnString = "I don't know how to do that.";
 		} else {
 			try {
-				var updateLocationString = getCurrentLocation(game).updateLocation(command);
+				var updateLocationString = helper.getCurrentLocation(game).updateLocation(command);
 			} catch(updateLocationError){
 				debug('---Failed to Perform updateLocation()');
 				debug('-----'+updateLocationError);
@@ -116,7 +116,7 @@ var actions = {
 			return {message: interact(game, 'drop', command.subject), success: true};
 		} catch(error) {
 			try {
-				var currentLocation = getCurrentLocation(game);
+				var currentLocation = helper.getCurrentLocation(game);
 				helper.moveItem(command.subject, game.player.inventory, currentLocation.items);
 				var item = helper.getItem(currentLocation.items, command.subject);
 				item.hidden = false;
@@ -131,7 +131,7 @@ var actions = {
 		if(!command.subject){
 			return {message: 'Where do you want to go?', success: false};
 		}
-		var exits = getCurrentLocation(game).exits;
+		var exits = helper.getCurrentLocation(game).exits;
 		var playerDestination = null
 		try {
 			playerDestination = exits[command.subject].destination;
@@ -146,9 +146,9 @@ var actions = {
 		if(playerDestination === null){
 			return {message: 'You can\'t go there.', success: false};
 		}
-		getCurrentLocation(game).firstVisit = false;
-		if (getCurrentLocation(game).teardown !== undefined){
-			getCurrentLocation(game).teardown();
+		helper.getCurrentLocation(game).firstVisit = false;
+		if (helper.getCurrentLocation(game).teardown !== undefined){
+			helper.getCurrentLocation(game).teardown();
 		}
 		if (game.map[playerDestination].setup !== undefined){
 			game.map[playerDestination].setup();
@@ -185,7 +185,7 @@ var actions = {
 			try {
 				return {message: helper.getItem(game.player.inventory, command.subject).description, success: true};
 			} catch (itemNotInInventoryError){
-				return {message: helper.getItem(getCurrentLocation(game).items, command.subject).description, success: true};
+				return {message: helper.getItem(helper.getCurrentLocation(game).items, command.subject).description, success: true};
 			}
 		} catch(isNotAnItemError) {
 			try {
@@ -205,7 +205,7 @@ var actions = {
 			return {message: interact(game, 'take', command.subject), success: true};
 		} catch(error) {
 			try {
-				helper.moveItem(command.subject, getCurrentLocation(game).items, game.player.inventory);
+				helper.moveItem(command.subject, helper.getCurrentLocation(game).items, game.player.inventory);
 				return {message: command.subject + ' taken', success: true};
 			} catch(error2){
 				return {message: 'Best just to leave the ' + command.subject + ' as it is.', success: false};
@@ -233,8 +233,11 @@ var actions = {
 		if(!command.subject){
 			return {message: 'What would you like to use?', success: false};
 		}
-		try {
-			return {message: helper.getItem(game.player.inventory, command.subject).use(), success: true};
+        try {
+            if (command.object && !helper.returnTargetInCurrentLocation(game, command.object)) {
+                return { message: 'You don\'t see a ' + command.object + ' nearby.', success: false };
+            }
+			return {message: helper.getItem(game.player.inventory, command.subject).use(game, command.subject, command.object), success: true};
 		} catch (itemNotInInventoryError) {
 			return {message: 'Can\'t do that.', success: false};
 		}
@@ -300,12 +303,8 @@ function exitsToString(exitsObject){
 	return returnString;
 }
 
-function getCurrentLocation(game){
-	return game.map[game.player.currentLocation];
-}
-
 function getLocationDescription(game, forcedLongDescription){
-	var currentLocation = getCurrentLocation(game);
+	var currentLocation = helper.getCurrentLocation(game);
 	var description;
 	if(currentLocation.firstVisit || forcedLongDescription){
         description = currentLocation.description;
@@ -426,21 +425,21 @@ function interactablesToString(interactablesObject) {
 }
 
 function getActor(game, subject) {
-    var actor = getCurrentLocation(game).actors[subject];
+    var actor = helper.getCurrentLocation(game).actors[subject];
     return actor;
 }
 
 function interact(game, interaction, subject){
 	try{
-        var message = getCurrentLocation(game).items[subject].interactions[interaction];
+        var message = helper.getCurrentLocation(game).items[subject].interactions[interaction];
         return message;
     } catch (notAnItemError) {
         try {
-            var message = getCurrentLocation(game).actors[subject][interaction];
+            var message = helper.getCurrentLocation(game).actors[subject][interaction];
             return message;
         }
         catch (notAnActorError) {
-            var message = getCurrentLocation(game).interactables[subject][interaction]();
+            var message = helper.getCurrentLocation(game).interactables[subject][interaction]();
             return message;
         }
 	}

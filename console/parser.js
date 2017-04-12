@@ -32,7 +32,7 @@ exports.parse = function (string){
 		}
 	}
 	// === Determine End of Object ===
-	for (i=objectStartIndex+1; i<components.length; ++i){
+	for (i=objectStartIndex; i<components.length; ++i){
 		if (skipWords.indexOf(components[i] === -1)){
 			if(command.object === ''){
 				command.object = command.object.concat(components[i]);

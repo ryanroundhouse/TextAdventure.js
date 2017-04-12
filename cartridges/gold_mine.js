@@ -39,15 +39,30 @@ var gameData = {
                 prospector : {
                     description : 'a grizzled old prospector',
                     look : 'The prospector chews on an old corn cob pipe, trying to unblock the mouthpiece.  You can see the dust billowing off of his rags with every jittery move he makes.',
-                    talk : function () { return 'The prospector glances up from his pipe.  He shows a wide toothy smile. "Howdy strangih!  Whachu doin\' round my parts?"' },
-                    hidden : false
+                    talk : function () { return 'The prospector glances up from his pipe.  He flashes a wide toothy smile. "Howdy strangih!  Whachu doin\' round my parts?"\n' +
+                                                'You shift uncomfortably as some of his spittle lands on your shirt.' },
+                    hidden : false,
+                    helmet : function () {
+                        this.hidden = true;
+                        return 'You toss the miner\'s cap with a flick of the wrist.  The prospector is stunned as it rings around atop his head until it comes to rest with a jaunty tilt.\n'
+                            + 'He clicks on the light and takes off at a dead sprint into the mine.  You hear his chattering laughter grow fainter and fainter.';
+                    }
                 }
             },
 			items : {
 				helmet : {
 					displayName : 'Miner Helmet',
 					description : 'A trusty old miner helmet covered in minor dents. Still seems sturdy and the light works.',
-					use : function(){return useLightSource();},
+                    use : function (game, subject, target){
+                        if (!target) {
+                            return useLightSource();
+                        }
+                        else {
+                            var targetObject = helper.returnTargetInCurrentLocation(game, target);
+                            /* delete object if it should be used up */
+                            return targetObject[subject]();
+                        }
+                    },
 					wearText : 'You pop the trusty old miner helmet onto your head.',
 					wear : function(){return equip(this);},
 					quantity : 2,
