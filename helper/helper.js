@@ -54,6 +54,18 @@ var checkForGameEnd = function (game, returnString, actions) {
     return returnString;
 }
 
+var removeItemFromObject = function (object, item) {
+    if (object[item].quantity > 1) {
+        --object[item].quantity;
+    }
+    else {
+        if (object[item] === undefined) {
+            throw 'itemNotInObject';   
+        }
+        delete object[item];
+    }
+}
+
 var moveItem = function (itemName, startLocation, endLocation) {
     var itemName = getItemName(startLocation, itemName);
     var itemAtOrigin = getItem(startLocation, itemName);
@@ -96,5 +108,6 @@ module.exports = {
     moveItem: moveItem,
     clone: clone,
     returnTargetInCurrentLocation : returnTargetInCurrentLocation,
-    getCurrentLocation : getCurrentLocation
+    getCurrentLocation : getCurrentLocation,
+    removeItemFromObject : removeItemFromObject
 }

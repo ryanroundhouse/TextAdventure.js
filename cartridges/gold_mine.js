@@ -59,7 +59,7 @@ var gameData = {
                         }
                         else {
                             var targetObject = helper.returnTargetInCurrentLocation(game, target);
-                            /* delete object if it should be used up */
+                            helper.removeItemFromObject(game.player.inventory, subject);
                             return targetObject[subject]();
                         }
                     },
