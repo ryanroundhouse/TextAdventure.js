@@ -58,6 +58,10 @@ The console implements the following player commands: `die`, `drop`, `go`, `inve
 
 The `use` command will run the `use` function of the item in the player's inventory that matches the command's subject.
 
+### `wear` Command
+
+The `wear` command will run the `wear` function of the item in the player's inventory that matches the command's subject.
+
 ## Cartridges
 
 Cartridges are loaded into the Console and are then playable by the user. The Console does most of the heavy lifting while the Cartridge adds all the flavor. A Cartridge consists of two very important objects, `gameData` and `gameActions`, as well as any number of helper functions.
@@ -177,6 +181,30 @@ The `use()` function will run then the user issues the 'use' command and names t
 **`interactions` Object**
 
 The `interactions` Object of an item is identical to an `interactables` object of a location except that it is tied to the item and will move with said item.
+
+##### `actors` Object
+
+The `actors` object contains any number of `actor` objects that can be interacted with in the current location.
+
+##### `actor` Object
+
+`actor` objects can be inspected by the `look` command.  They can also become hidden and not be displayed in description text.
+
+**`description`**
+
+The 'description' of an `actor` is the string returned when the user submits the 'look' command lists the item's name or `displayName` as the subject.
+
+**`displayName`**
+
+The `displayName` of an actor is the string used by the console in all text related to the actor that is displayed to the user.
+
+**`hidden`**
+
+`hidden` is a boolean that if set to true will prevent the console from listing the actor as in the location when constructing the location's description. Alternatively if `hidden` is set to true the actor will be listed in the location's description.
+
+**`interactions`**
+
+when you want an `item` to interact with an `actor`, add a function to the 'interactions' object of the `actor` that matches the item name.  That 'interaction' will be executed when the `item` is used on the `actor`.
 
 ##### `exits` Object
 

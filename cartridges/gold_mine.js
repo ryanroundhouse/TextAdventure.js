@@ -42,10 +42,12 @@ var gameData = {
                     talk : function () { return 'The prospector glances up from his pipe.  He flashes a wide toothy smile. "Howdy strangih!  Whachu doin\' round my parts?"\n' +
                                                 'You shift uncomfortably as some of his spittle lands on your shirt.' },
                     hidden : false,
-                    helmet : function () {
-                        this.hidden = true;
-                        return 'You toss the miner\'s cap with a flick of the wrist.  The prospector is stunned as it rings around atop his head until it comes to rest with a jaunty tilt.\n'
+                    interactions : {
+                        helmet : function () {
+                            this.hidden = true;
+                            return 'You toss the miner\'s cap with a flick of the wrist.  The prospector is stunned as it rings around atop his head until it comes to rest with a jaunty tilt.\n' 
                             + 'He clicks on the light and takes off at a dead sprint into the mine.  You hear his chattering laughter grow fainter and fainter.';
+                        }
                     }
                 }
             },
@@ -60,7 +62,7 @@ var gameData = {
                         else {
                             var targetObject = helper.returnTargetInCurrentLocation(game, target);
                             helper.removeItemFromObject(game.player.inventory, subject);
-                            return targetObject[subject]();
+                            return targetObject.interactions[subject]();
                         }
                     },
 					wearText : 'You pop the trusty old miner helmet onto your head.',
