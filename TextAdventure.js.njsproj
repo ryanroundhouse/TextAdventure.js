@@ -30,6 +30,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="cartridges\farpoint.js" />
     <Compile Include="cartridges\gold_mine.js" />
     <Compile Include="console\console.js" />
     <Compile Include="console\parser.js" />

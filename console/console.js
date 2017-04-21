@@ -425,7 +425,8 @@ function interactablesToString(interactablesObject) {
 }
 
 function getActor(game, subject) {
-    var actor = helper.getCurrentLocation(game).actors[subject];
+    var location = helper.getCurrentLocation(game);
+    var actor = location.actors[subject];
     return actor;
 }
 
@@ -435,7 +436,9 @@ function interact(game, interaction, subject){
         return message;
     } catch (notAnItemError) {
         try {
-            var message = helper.getCurrentLocation(game).actors[subject][interaction];
+            var location = helper.getCurrentLocation(game)
+            var actor = location.actors[subject];
+            var message = actor[interaction];
             return message;
         }
         catch (notAnActorError) {
