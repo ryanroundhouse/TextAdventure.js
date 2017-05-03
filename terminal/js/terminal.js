@@ -43,7 +43,7 @@ $(function(){
 	// ----- Window Resize Listener -----------------------------------------------------
 	$(window).resize(function(){
 		displayResize();
-	});
+    });
 });
 
 // ===== Functions ======================================================================
@@ -68,4 +68,9 @@ function toScreen(message, actor){
 	var displayString = $('#display').val() + message + '\n';
 	$('#display').val(displayString);
 	$('#display').scrollTop($('#display')[0].scrollHeight);
+}
+
+// ----- On click highlight textarea
+function highlightTextArea(){
+    $('#input').focus();
 }

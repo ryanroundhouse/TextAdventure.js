@@ -35,7 +35,7 @@ var gameData = {
             firstVisit : true,
             displayName : 'Bridge',
             description : '[Bridge]\nYou enter the bridge.  You\'ve never stepped foot on a starship that still had the \'new ship smell\'.\n' +
-                        '"My crew is short in several key positions, most notably a first officer, but I am informed that a highly experienced man, one Commander William Riker, will be waiting to join our ship when we reach our Deneb IV destination."\n',
+                        '"My crew is short in several key positions, most notably a first officer, but I am informed that a highly experienced man, one Commander William Riker, will be waiting to join our ship when we reach our Deneb IV destination"',
             interactables : {
                 viewscreen: {
                     look : function() {

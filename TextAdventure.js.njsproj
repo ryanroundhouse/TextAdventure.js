@@ -43,6 +43,7 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Content Include="terminal\css\terminal.css" />
+    <Content Include="terminal\img\lcars title.png" />
     <Content Include="terminal\index.html" />
   </ItemGroup>
   <ItemGroup>
@@ -51,6 +52,7 @@
     <Folder Include="helper\" />
     <Folder Include="terminal\" />
     <Folder Include="terminal\css\" />
+    <Folder Include="terminal\img\" />
     <Folder Include="terminal\js\" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
