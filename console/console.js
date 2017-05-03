@@ -442,7 +442,9 @@ function interact(game, interaction, subject){
             return message;
         }
         catch (notAnActorError) {
-            var message = helper.getCurrentLocation(game).interactables[subject][interaction]();
+            var location = helper.getCurrentLocation(game);
+            var interactable = location.interactables[subject];
+            var message = interactable[interaction]();
             return message;
         }
 	}
