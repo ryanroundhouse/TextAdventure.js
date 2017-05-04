@@ -4,7 +4,8 @@ var debugMode = false;
 // === Initilize Express ===
 var express = require('express');
 var bodyParser = require('body-parser');
-var session = require('express-session')
+var session = require('express-session');
+var config = require('cloud-env');
 var app = express();
 
 // === Import Necessary Functionality ==
@@ -14,10 +15,10 @@ app.use(express.static(__dirname + '/terminal'));
 app.use(session({secret: '1234567890QWERTY', resave: false, saveUninitialized: true}));
 
 // === Start Server ===
-var server_port = process.env.OPENSHIFT_NODEJS_PORT || '8000';
-var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
-var server = app.listen(server_port, server_ip_address, function () {
-  console.log( "Listening on " + server_ip_address + ", server_port " + server_port )
+var port = config.get('PORT', 8000)
+var bind_address = config.get('IP', '127.0.0.1')
+var server = app.listen(port, bind_address, function () {
+  console.log( "Listening on " + bind_address + ", server_port " + port)
 });
 
 // === Create Console ===
@@ -25,7 +26,7 @@ var con = require('./console/console.js');
 
 // // === Open Browser ===
 var open = require('open');
-open('http://10.129.65.20:3000');
+//open('http://' + bind_address + ':' + port);
 //open('http://rg-text-adventure-rg-textadventure.1d35.starter-us-east-1.openshiftapps.com:3000');
 
 // === Respond to AJAX calls ===
